@@ -7,7 +7,7 @@
                 <h2 style="font-size:1rem;">文房具変更画面</h2>
             </div>
             <div class="pull-right">
-                <a class="btn btn-success" href="{{ url('/bunbougus') }}">戻る</a>
+                <a class="btn btn-success" href="{{ url('/bunbougus') }}?page={{ $page_id }}">戻る</a>
             </div>
         </div>
     </div>
@@ -56,8 +56,8 @@
                     </div>
                 </div>
                 <div class="col-12 mb-2 mt-2">
+                        <input type="hidden" name="page" value="{{ $page_id }}"> <!-- ★ -->
                         <button type="submit" class="btn btn-primary w-100">変更</button>
-                        <input type="hidden" name="page_id" value="{{ $page_id }}">
                 </div>
             </div>      
         </form>

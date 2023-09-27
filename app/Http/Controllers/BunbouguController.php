@@ -81,8 +81,8 @@ class BunbouguController extends Controller
     {
         $bunruis = Bunrui::all();
         return view('edit',compact('bunbougu'))
-        ->with('page_id',request()->page_id)
-        ->with('bunruis',$bunruis);
+            ->with('page_id',request()->page_id) //★これを外すとeditページを開いたとたんUndefined $page_idになる
+            ->with('bunruis',$bunruis);
     }
 
     /**
@@ -104,8 +104,9 @@ class BunbouguController extends Controller
         //$bunbougu->user_id = \Auth::user()->id;
         $bunbougu->save();
 
-        return redirect()->route('bunbougus.index')
-        ->with('page_id',request()->page_id)
+        $page = request()->input('page'); //★この行が無いとUndefined $pageになる
+
+        return redirect()->route('bunbougus.index', ['page' => $page]) //★
         ->with('success','文房具を更新しました');
     }
 
