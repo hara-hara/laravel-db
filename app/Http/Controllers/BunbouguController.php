@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Bunbougu;
 use Illuminate\Http\Request;
 use App\Models\Bunrui;
+use Illuminate\Support\Facades\Log; //デバッグ用
 
 class BunbouguController extends Controller
 {
@@ -26,8 +27,10 @@ class BunbouguController extends Controller
             $join->on('b.bunrui', '=', 'r.id');
         })
         ->orderBy('b.id', 'DESC')
+        //->where('r.str','LIKE','鉛筆')
         ->paginate(5);
-        
+
+
         return view('index',compact('bunbougus'))
             ->with('page_id',request()->page)
             ->with('i', (request()->input('page', 1) - 1) * 5);
@@ -66,6 +69,8 @@ class BunbouguController extends Controller
      */
     public function show(Bunbougu $bunbougu)
     {
+        // 配列
+        Log::debug($bunbougu);
         $bunruis = Bunrui::all();
         return view('show',compact('bunbougu'))
             ->with('page_id',request()->page_id)
