@@ -65,6 +65,8 @@ return [
             'model' => App\Models\User::class,
         ],
 
+        Maatwebsite\Excel\ExcelServiceProvider::class,  //add by hara 2023-12-8
+
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
@@ -111,5 +113,8 @@ return [
     */
 
     'password_timeout' => 10800,
-
+    
+    'aliases' => [  //add by hara 2023-12-8
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+    ],
 ];

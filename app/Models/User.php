@@ -42,4 +42,12 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function bunbougus(){
+        return $this->hasMany(Bunbougu::class);
+    }
+
+    public function worktimes(){
+        return $this->hasMany(Worktime::class);
+    }
 }

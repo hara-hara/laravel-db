@@ -13,7 +13,7 @@
     </div>
     
     <div style="text-align:right;">
-    <form action="{{ route('bunbougus.store') }}" method="POST">
+    <form action="{{ route('bunbougu.store') }}" method="POST">
         @csrf
         
         <div class="row">
@@ -57,6 +57,8 @@
                 </div>
             </div>
             <div class="col-12 mb-2 mt-2">
+                    <input type="hidden" name="user_id" value="2"> <!-- ★ -->
+
                     <button type="submit" class="btn btn-primary w-100">登録</button>
             </div>
         </div>      

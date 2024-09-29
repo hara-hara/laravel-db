@@ -16,7 +16,9 @@
         <form action="{{ route('worktime.update') }}" method="POST">
             @method('PUT')
             @csrf
-
+            <div class="col-12 mb-2 mt-2">
+                    <button type="submit" class="btn btn-primary w-100">変更</button>
+            </div>
             
             <table class="table table-bordered">
                 <tr>

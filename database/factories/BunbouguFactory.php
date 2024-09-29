@@ -21,6 +21,7 @@ class BunbouguFactory extends Factory
             'kakaku' => $this->faker->numberBetween($min = 50, $max = 999),
             'bunrui' => $this->faker->numberBetween($min = 1, $max = 3),
             'shosai' => $this->faker->realText(50),
+            'user_id' => $this->faker->numberBetween($min = 1, $max = 1),
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => null,
         ];

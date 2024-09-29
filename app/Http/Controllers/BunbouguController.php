@@ -20,6 +20,7 @@ class BunbouguController extends Controller
             'b.name',
             'b.kakaku',
             'b.shosai',
+            'b.user_id',
             'r.str as bunrui',
         ])
         ->from('bunbougus as b')
@@ -31,9 +32,18 @@ class BunbouguController extends Controller
         ->paginate(5);
 
 
-        return view('index',compact('bunbougus'))
-            ->with('page_id',request()->page)
-            ->with('i', (request()->input('page', 1) - 1) * 5);
+        //ログインしていない場合、エラーが出ますので、以下のように処理を分けます。
+        if(isset(\Auth::user()->name)){
+            return view('index',compact('bunbougus'))
+                ->with('page_id',request()->page)
+                ->with('i', (request()->input('page', 1) - 1) * 5)
+                ->with('user_name',\Auth::user()->name);
+        }else{
+            return view('index',compact('bunbougus'))
+                ->with('page_id',request()->page)
+                ->with('i', (request()->input('page', 1) - 1) * 5);
+        }
+
     }
 
     /**
@@ -59,6 +69,9 @@ class BunbouguController extends Controller
         ]);
 
         $input = $request->all();
+        //dd($input);
+        $input['user_id'] = \Auth::user()->id;
+        
         Bunbougu::create($input);
         return redirect()->route('bunbougus.index')
             ->with('success','文房具を登録しました');
@@ -106,13 +119,15 @@ class BunbouguController extends Controller
         $bunbougu->kakaku = $request->input(["kakaku"]);
         $bunbougu->bunrui = $request->input(["bunrui"]);
         $bunbougu->shosai = $request->input(["shosai"]);
-        //$bunbougu->user_id = \Auth::user()->id;
+        $bunbougu->updated_at = date("Y-m-d H:i:s");
+        $bunbougu->user_id = \Auth::user()->id;
+        //dd($bunbougu);
         $bunbougu->save();
 
         $page = request()->input('page'); //★この行が無いとUndefined $pageになる
 
         return redirect()->route('bunbougus.index', ['page' => $page]) //★
-        ->with('success','文房具を更新しました');
+        ->with('message','文房具を更新しました');
     }
 
     /**
