@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.btn{
+    @apply font-bold py-2 px-2 rounded m-2;
+}
+.btn-blue{
+    @apply bg-blue-500 text-white text-sm;
+}
+.btn-blue:hover{
+    @apply bg-blue-600;
+}
+.btn-orange{
+    @apply bg-orange-700 text-white text-sm;
+}
+.btn-orange:hover{
+    @apply bg-orange-800;
+}
+.btn-green{
+    @apply bg-green-700 text-white text-sm;
+}
+.btn-green:hover{
+    @apply bg-green-800;
+}
+.mat-head1{
+    @apply text-white bg-blue-700 text-sm;
+}
+
+
+.matrix-normal{
+    @apply border-separate border border-slate-900;
+}
+
+.matrix-header{
+    @apply border-separate border border-slate-900 text-white bg-blue-700 text-sm ;
+}

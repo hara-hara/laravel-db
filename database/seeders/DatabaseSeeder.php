@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             UsersSeeder::class,
             WorktypesSeeder::class,
             WorktimesSeeder::class,
+            User_group_type::class,
         ]);
 
     }

@@ -45,7 +45,6 @@ class WorktimeController extends Controller
         else{
             $cur_year=$now_year;
         }
-        //dd($cur_month);
         if(isset($request->cur_month)){
             $cur_month=$request->cur_month;
             if ($cur_month==13){
@@ -117,7 +116,6 @@ class WorktimeController extends Controller
         ->where('m.id','=',$user_group_type->master_id)
         ->first();
 
-        $ii=0;
         $kinType=0;
 
 
@@ -131,6 +129,7 @@ class WorktimeController extends Controller
         $aftenoonoff_times = $master_worktime_type->aftenoonoff_times;
 
 
+        /* 日付毎に各種時間を計算して配列に格納 */
         $ii=0;
         foreach($worktimes as $worktime){
             $ii++;
@@ -172,7 +171,35 @@ class WorktimeController extends Controller
             }
  
         }
- 
+
+        /* カレント月の回数、時間を集計し変数に格納 */
+        $workday_counts=0;              //出勤日数
+        $v_dayoff_counts=0;             //欠勤日数
+        $use_dayoff_counts=0;           //有休取得日数
+        $use_dayoff_hours=0;            //有休取得時間(H)
+        foreach($worktimes as $worktime){
+            if($worktime->work_type==1 or $worktime->work_type==2){
+                $workday_counts++;
+                $v_dayoff_counts++;
+                $use_dayoff_counts++;
+                $use_dayoff_hours++;
+            }
+        }
+        $need_total_worktimes_hours = $workday_counts * $basic_work_times; //必要総就業時間(H)
+
+        /* カレント月の回数、時間を集計し変数に格納(既設配列から計算) */
+        $total_work_hours=0;            //総労働時間(H)
+        $total_overtime_hours=0;        //総残業時間(H)
+        $total_law_time_hours=0;        //総法定内残業時間(H)
+        $total_law_time_outer_hours=0;  //総法定外内残業時間(H)
+        for($i=1;$i<=$ii;$i++){
+            $total_work_hours = $total_work_hours + $w_time_results[$i]['roudou_time'];
+            $total_overtime_hours = $total_overtime_hours + $w_time_results[$i]['zangyou_time']; 
+            $total_law_time_hours = $total_law_time_hours + $w_time_results[$i]['houteinai_time'];
+            $total_law_time_outer_hours = $total_law_time_outer_hours + $w_time_results[$i]['houteigai_time'];
+        }
+        $total_worktime_hours = $total_work_hours + $use_dayoff_hours; //総就業時間(H)
+
         //初めて入力する月はDBにデータなしのため、データ空のコレクション型になる。
         //compactで空のコレクション型を渡すとエラーになる為その場合はnullを入れる。
         if($worktimes->isEmpty()){
@@ -192,6 +219,16 @@ class WorktimeController extends Controller
                 ->with('cur_year',$cur_year)
                 ->with('cur_month',$cur_month)
                 ->with('month_lastday',$month_lastday)
+                ->with('workday_counts',$workday_counts)
+                ->with('v_dayoff_counts',$v_dayoff_counts)
+                ->with('use_dayoff_counts',$use_dayoff_counts)
+                ->with('use_dayoff_hours',$use_dayoff_hours)
+                ->with('need_total_worktimes_hours',$need_total_worktimes_hours)
+                ->with('total_work_hours',$total_work_hours)
+                ->with('total_overtime_hours',$total_overtime_hours)
+                ->with('total_law_time_hours',$total_law_time_hours)
+                ->with('total_law_time_outer_hours',$total_law_time_outer_hours)
+                ->with('total_worktime_hours',$total_worktime_hours)
                 ->with('user_name',\Auth::user()->name); //ログイン者名
         }else{
             return view('worktime_index',compact('worktimes','w_time_results','master_worktime_type','worktypes','users'))
@@ -200,10 +237,21 @@ class WorktimeController extends Controller
                 ->with('cur_user_id',$cur_user_id)
                 ->with('cur_year',$cur_year)
                 ->with('cur_month',$cur_month)
-                ->with('month_lastday',$month_lastday);
+                ->with('month_lastday',$month_lastday)
+                ->with('workday_counts',$workday_counts)
+                ->with('v_dayoff_counts',$v_dayoff_counts)
+                ->with('use_dayoff_counts',$use_dayoff_counts)
+                ->with('use_dayoff_hours',$use_dayoff_hours)
+                ->with('need_total_worktimes_hours',$need_total_worktimes_hours)
+                ->with('total_work_hours',$total_work_hours)
+                ->with('total_overtime_hours',$total_overtime_hours)
+                ->with('total_law_time_hours',$total_law_time_hours)
+                ->with('total_law_time_outer_hours',$total_law_time_outer_hours)
+                ->with('total_worktime_hours',$total_worktime_hours);
         }
 
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -448,7 +496,6 @@ class WorktimeController extends Controller
         
         //Log::debug(print_r($worktimes, true));
         //Log::debug($worktimes);
-        //dd($request,$worktimes);
 
         return redirect()
             ->route('worktime.index',

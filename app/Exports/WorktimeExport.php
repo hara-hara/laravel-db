@@ -9,14 +9,14 @@ use Maatwebsite\Excel\Concerns\WithHeadings; //ヘッダーをつける
 //use Maatwebsite\Excel\Concerns\WithTitle;
 //use Maatwebsite\Excel\Concerns\ToModel;
 
-class StudentExport implements FromCollection,WithHeadings
+class WorktimeExport implements FromCollection,WithHeadings
 {
     /**
     * @return \Illuminate\Support\Collection
     */
     public function collection()
     {
-        return Students::all()->makeHidden(['id', 'created_at', 'updated_at']);
+        return Worktimes::all()->makeHidden(['id', 'created_at', 'updated_at']);
         //return users::all();
     }
 

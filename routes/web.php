@@ -13,6 +13,13 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/timestamps/', 'App\Http\Controllers\TimestampController@index')->name('timestamp.index');
+Route::put('/timestamps/aa', 'App\Http\Controllers\TimestampController@update')->name('timestamp.update')->middleware('auth');
+//Route::get('/timestamps/aa','App\Http\Controllers\TimestampController@edit')->name('timestamp.edit')->middleware('auth');
+//Route::get('/timestamps', [App\Http\Controllers\TimestampController::class,'index'])->name('timestamp.index');
+
+
+
 Route::get('/bunbougus', 'App\Http\Controllers\BunbouguController@index')->name('bunbougus.index');
 Route::get('/bunbougus/create', 'App\Http\Controllers\BunbouguController@create')->name('bunbougu.create')->middleware('auth');
 Route::post('/bunbougus/store/', 'App\Http\Controllers\BunbouguController@store')->name('bunbougu.store')->middleware('auth');
