@@ -16,25 +16,47 @@
                         <th class="px-2">従業員番号</th>
                         <th class="px-2">名前</th>
                         <th class="px-2">勤務タイプ</th>
-                        <th class="px-2">年月</th>
                         <th class="px-2">申請日</th>
                         <th class="px-2">承認日</th>
-                        <th class="px-2">承認者ID</th>
+                        <th class="px-2">承認者者</th>
+
+                        
                     </tr>
                     <tr>
-                        <td class="matrix-normal"></td>
+                        <td class="text-center matrix-normal"></td>
                         @foreach ($users as $user)
                             @if($user->id==$cur_user_id)
-                                <td class="matrix-normal">
+                                <td class="text-center matrix-normal">
                                     {{$user->name}}
                                 </td>
                             @endif
                         @endforeach
-                        <td class="matrix-normal"></td>
-                        <td class="matrix-normal"></td>
-                        <td class="matrix-normal"></td>
-                        <td class="matrix-normal"></td>
-                        <td class="matrix-normal"></td>
+                        <td class="text-center matrix-normal">{{ $master_worktime_type->id }}</td>
+                        <td class="text-center matrix-normal"></td>
+                        <td class="text-center matrix-normal"></td>
+                        <td class="text-center matrix-normal"></td>
+
+
+                    </tr>
+                </table>
+                <table>
+                    <tr class="matrix-header">
+                        <th class="px-2">可能就業時間帯</th>
+                        <th class="px-2">基本就業時間帯</th>
+                        <th class="px-2">基本就業時間(H)</th>
+                        <th class="px-2">休憩時間(H)</th>
+                        <th class="px-2">有休(H)</th>
+                        <th class="px-2">AM半休(H)</th>
+                        <th class="px-2">PM半休(H)</th>
+                    </tr>
+                    <tr>
+                        <td class="text-center matrix-normal">{{ $able_worktime_start }}～{{ $able_worktime_end }}</td>
+                        <td class="text-center matrix-normal">{{ $basic_worktime_start }}～{{ $basic_worktime_end }}</td>
+                        <td class="text-center matrix-normal">{{ $basic_worktimes }}</td>
+                        <td class="text-center matrix-normal">{{ $master_worktime_type->lunch_break_times }}</td>
+                        <td class="text-center matrix-normal">{{ $master_worktime_type->dayoff_times }}</td>
+                        <td class="text-center matrix-normal">{{ $master_worktime_type->morningoff_times }}</td>
+                        <td class="text-center matrix-normal">{{ $master_worktime_type->aftenoonoff_times }}</td>
                     </tr>
                 </table>
 
@@ -96,155 +118,108 @@
                         </tr>
                     </table>
                                         
+
                     <table class="mx-1 my-2 border-separate border border-slate-900">
                         <tr class="">
                             <th rowspan="2" class="matrix-normal">日</th>
                             <th rowspan="2" class="matrix-normal">曜日</th>
                             <th rowspan="2" class="matrix-normal">区分</th>
-                            <th colspan="2" class="matrix-normal">打刻時刻</th>
+                            <th colspan="2" class="matrix-normal">出退時刻</th>
                             <th colspan="2" class="matrix-normal">就業時刻</th>
                             <th colspan="4" class="matrix-normal">就業時間</th>
                         </tr>
                         <tr>
                             <th class="matrix-normal">出社</th>
                             <th class="matrix-normal">退社</th>
-                            <th class="matrix-normal">開始打刻</th>
-                            <th class="matrix-normal">終了打刻</th>
+                            <th class="matrix-normal w-20">開始</th>
+                            <th class="matrix-normal w-20">終了</th>
                             <th class="matrix-normal">労働時刻</th>
                             <th class="matrix-normal">法定内残業</th>
                             <th class="matrix-normal">法定外残業</th>
                             <th class="matrix-normal">残業</th>
+                            {{--
                             <th class="matrix-normal">更新</th>
                             <th class="matrix-normal">承認</th>
+                            --}}
                         </tr>
-                        <?php $ii=0; ?>
-                        @if($worktimes!=null)
-                            @foreach ($worktimes as $worktime)
-                                <?php $ii++; ?>
-                                <tr>
-                                    <td class="text-center matrix-normal">{{ date('j',strtotime($worktime->work_date)) }}</td>
+                        @for($ii=1;$ii<=$month_lastday;$ii++)
+                            <tr class="text-center">
+                                <td class="text-center matrix-normal">{{$ii}}</td>
                                     <td class="text-center matrix-normal">
-                                        @switch(date('w',strtotime($worktime->work_date) ))
-                                        @case(0) <font color="red">日</font> @break
-                                        @case(1) 月 @break
-                                        @case(2) 火 @break
-                                        @case(3) 水 @break
-                                        @case(4) 木 @break
-                                        @case(5) 金 @break
-                                        @case(6) <font color="blue">土</font> @break
+                                        @switch(date('w',strtotime($cur_year."-".$cur_month."-".$ii) ))
+                                            @case(0) <font color="red">日</font> @break
+                                            @case(1) 月 @break
+                                            @case(2) 火 @break
+                                            @case(3) 水 @break
+                                            @case(4) 木 @break
+                                            @case(5) 金 @break
+                                            @case(6) <font color="blue">土</font> @break
                                         @endswitch
                                     </td>
                                     <td class="matrix-normal">
-                                        <select class="py-1 block w-full rounded-md border-gray-300 shadow-sm text-xs text-gray-800 bg-white focus:ring-indigo-500 focus:border-indigo-500" name="work_type-{{ date('j',strtotime($worktime->work_date)) }}">
+                                        <select class="py-1 block w-full rounded-md border-gray-300 shadow-sm text-xs text-gray-800 bg-white focus:ring-indigo-500 focus:border-indigo-500" name="work_type-{{ $ii }}">
                                             <option value="">選択して下さい</option>
                                             @foreach ($worktypes as $worktype)
-                                                <option value="{{ $worktype->id }}" @if($worktype->id==$worktime->work_type) selected @endif>{{ $worktype->str }}</otion>
+                                                <option value="{{ $worktype->id }}" @if($worktype->id == $w_time_results[$ii]['work_type']) selected @endif >
+                                                    {{ $worktype->str }} 
+                                                </otion>
                                             @endforeach
                                         </select>
-                                        <input type="hidden" name="hidden-work_type-{{ date('j',strtotime($worktime->work_date)) }}" value="{{$worktime->work_type}}">
+                                        <input type="hidden" name="hidden-work_type-{{ $ii }}" value="{{ $w_time_results[$ii]['work_type'] }}">
 
                                     </td>
                                     <td class="matrix-normal">
-                                        <input class="w-20 h-6" type="text" name="result_work_start-{{ date('j',strtotime($worktime->work_date)) }}" value="@if($worktime->result_work_start <> ''){{ date('G:i',strtotime($worktime->result_work_start)) }}@endif"  placeholder="">
-                                        <input type="hidden" name="hidden-result_work_start-{{ date('j',strtotime($worktime->work_date)) }}" value="@if($worktime->result_work_start <> '' ) {{ date('G:i',strtotime($worktime->result_work_start)) }}@endif" >
-                                        @error('work_start')
-                                        <span style="color:red;">名前を20文字以内で入力してください</span>
+                                        <input class="w-20 h-6" type="text" name="result_work_start-{{ $ii }}" value="{{ $w_time_results[$ii]['result_work_start']  }}"  placeholder="">
+                                        <input type="hidden" name="hidden-result_work_start-{{ $ii }}" value="{{ $w_time_results[$ii]['result_work_start']  }}">
+                                        @error('temp_result_work_start')
+                                            <span style="color:red;">時間の形式で入力して下さい</span>
                                         @enderror
                                     </td>
                                     <td class="matrix-normal">
-                                        <input class="w-20 h-6" type="text" name="result_work_end-{{ date('j',strtotime($worktime->work_date)) }}" value="@if($worktime->result_work_end <> '') {{ date('G:i',strtotime($worktime->result_work_end)) }} @endif"  placeholder="">
-                                        <input type="hidden" name="hidden_result_work_end-{{ date('j',strtotime($worktime->work_date)) }}" value="@if($worktime->result_work_end <> '') {{ date('G:i',strtotime($worktime->result_work_end)) }} @endif" >
-                                        @error('work_end')
-                                            <span style="color:red;">名前を20文字以内で入力してください</span>
+                                        <input class="w-20 h-6" type="text" name="result_work_end-{{ $ii }}" value="{{ $w_time_results[$ii]['result_work_end']  }}"  placeholder="">
+                                        <input type="hidden" name="hidden_result_work_end-{{ $ii }}" value="{{ $w_time_results[$ii]['result_work_end']  }}">
+                                        @error('temp_result_work_end')
+                                            <span style="color:red;">時間の形式で入力して下さい</span>
                                         @enderror
                                     </td>
 
-                                    <td class="matrix-normal">@if($worktime->real_work_start<>"") {{ date('G:i',strtotime($worktime->real_work_start)) }} @endif</td>
-
-
-                                    <td class="matrix-normal">@if($worktime->real_work_end<>"") {{ date('G:i',strtotime($worktime->real_work_end)) }} @endif</td>
-
-                                    <td class="matrix-normal">
-                                        @if($worktime->result_work_start<>"" && $worktime->result_work_end<>"")
-                                            {{ $w_time_results[$ii]['roudou_time'] }} 
-                                        @endif
-                                    </td>
-                                    <td class="matrix-normal">@if($worktime->result_work_start<>"" && $worktime->result_work_end<>"") {{ $w_time_results[$ii]['houteinai_time'] }} @endif</td>
-                                    <td class="matrix-normal">@if($worktime->result_work_start<>"" && $worktime->result_work_end<>"") {{ $w_time_results[$ii]['houteigai_time'] }} @endif</td>
-                                    <td class="matrix-normal">@if($worktime->result_work_start<>"" && $worktime->result_work_end<>"") {{ $w_time_results[$ii]['zangyou_time'] }} @endif</td>
-                                    <td class="matrix-normal">@if($worktime->result_work_start<>"" && $worktime->result_work_end<>"") {{ $w_time_results[$ii]['zangyou_time'] }} @endif</td>
-                                    <td class="matrix-normal">@if($worktime->result_work_start<>"" && $worktime->result_work_end<>"") {{ $w_time_results[$ii]['zangyou_time'] }} @endif</td>
-                                </tr>
-                            @endforeach
-                        @else
-                            @for($j=1;$j<=$month_lastday;$j++)
-                                <?php $ii++; ?>
-                                <tr>
-                                    <td class="matrix-normal">{{$j}}</td>
-                                    <td class="matrix-normal">
-                                        @switch(date('w',strtotime($cur_year.'-'.$cur_month.'-'.$j) ))
-                                        @case(0) <font color="red">日</font> @break
-                                        @case(1) 月 @break
-                                        @case(2) 火 @break
-                                        @case(3) 水 @break
-                                        @case(4) 木 @break
-                                        @case(5) 金 @break
-                                        @case(6) <font color="blue">土</font> @break
-                                        @endswitch
-                                    </td>
-                                    <input type="hidden" name="work_date-{{$j}}" value="{{ $cur_year.'-'.$cur_month.'-'.$j }}">
-                                    <td class="matrix-normal">
-                                        <select name="work_type-{{$j}}">
-                                        <option value="">選択して下さい</option>
-                                        @foreach ($worktypes as $worktype)
-                                                <option value="{{ $worktype->id }}">{{ $worktype->str }}</option>
-                                            @endforeach
-                                        </select>
-                                        <input type="hidden" name="hidden-work_type-{{$j}}" value="">
-                                        @error('work_type')
-                                        <span style="color:red;">分類を選択してください</span>
-                                        @enderror
-                                    </td>
-
-                                    
-                                    <td class="matrix-normal">
-                                        <input type="text" name="result_work_start-{{$j}}" value="" placeholder="">
-                                        <input type="hidden" name="hidden-result_work_start-{{$j}}" value="" >
-                                        @error('work_start')
-                                        <span style="color:red;">名前を20文字以内で入力してください</span>
-                                        @enderror
-                                    </td>
-                                    
-                                    <td class="matrix-normal">
-                                    <input type="text" name="result_work_end-{{$j}}" value="" placeholder="">
-                                    <input type="hidden" name="hidden_result_work_end-{{$j}}" value="" >
-                                        @error('work_end')
-                                            <span style="color:red;">名前を20文字以内で入力してください</span>
-                                        @enderror
-                                    </td>
-                                    
-                                    <td class="matrix-normal"></td>
-                                    <td class="matrix-normal"></td>
-                                    <td class="matrix-normal"></td>
-                                    <td class="matrix-normal"></td>
-                                    <td class="matrix-normal"></td>
-                                    <td class="matrix-normal"></td>
-                                    <td class="matrix-normal"></td>
-                                    <td class="matrix-normal"></td>
-                                    <td class="matrix-normal"></td>
-                                </tr>
-                            @endfor
-                        @endif
+                                    @if($w_time_results[$ii]['result_work_start']  <> "" && $w_time_results[$ii]['result_work_end']  <> "")
+                                        <td class="matrix-normal">{{ $w_time_results[$ii]['real_work_start'] }}</td>
+                                        <td class="matrix-normal">{{ $w_time_results[$ii]['real_work_end'] }}</td>
+                                        <td class="matrix-normal">{{ $w_time_results[$ii]['roudou_time'] }}</td>
+                                        <td class="matrix-normal">{{ $w_time_results[$ii]['houteinai_time'] }}</td>
+                                        <td class="matrix-normal">{{ $w_time_results[$ii]['houteigai_time'] }}</td>
+                                        <td class="matrix-normal">{{ $w_time_results[$ii]['zangyou_time'] }}</td>
+                                        {{--
+                                        <td class="matrix-normal"></td>
+                                        <td class="matrix-normal"></td>
+                                        --}}
+                                    @else
+                                        <td class="matrix-normal"></td>    
+                                        <td class="matrix-normal"></td>    
+                                        <td class="matrix-normal"></td>    
+                                        <td class="matrix-normal"></td>    
+                                        <td class="matrix-normal"></td>    
+                                        <td class="matrix-normal"></td>
+                                        {{--
+                                        <td class="matrix-normal"></td>    
+                                        <td class="matrix-normal"></td>
+                                        --}}    
+                                    @endif
+                            </tr>
+                        @endfor
                     </table>
                 </form>
             </section>
         </main>
     </div>
->
+
 
 
     <script>
-        <!-- 更新ボタンクリックでメッセージを出す -->
+        <!-- 更新ボタンクリックでメッセージを出す --> 	
+        {{-- ここのコメントはHTML上には表示されません --}}
+
         function changePost(e){
                 'use strict'
                 if(confirm('更新しますか？')){

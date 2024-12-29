@@ -62,7 +62,6 @@ class WorktimeController extends Controller
 
         //lastday求める
         $month_lastday = date('d',strtotime($cur_year.'-'.$cur_month.' last day of this month'));
-        //$month_lastday=30;
 
         // usersテーブルを取得
         $users = User::all();
@@ -116,6 +115,7 @@ class WorktimeController extends Controller
         ->where('m.id','=',$user_group_type->master_id)
         ->first();
 
+        
         $kinType=0;
 
 
@@ -128,19 +128,61 @@ class WorktimeController extends Controller
         //午後半休の工数
         $aftenoonoff_times = $master_worktime_type->aftenoonoff_times;
 
+        //可能就業時間帯と基本就業時間帯をG:iの形式で格納
+        $able_worktime_start = date('G:i',strtotime($master_worktime_type->able_worktime_start));
+        $able_worktime_end = date('G:i',strtotime($master_worktime_type->able_worktime_end));
+        $basic_worktime_start = date('G:i',strtotime($master_worktime_type->basic_worktime_start));
+        $basic_worktime_end = date('G:i',strtotime($master_worktime_type->basic_worktime_end));        
 
         /* 日付毎に各種時間を計算して配列に格納 */
         $ii=0;
         foreach($worktimes as $worktime){
             $ii++;
+            //日(いらないかも)
+            $w_time_results[$ii]['day'] = date('j',strtotime($worktime->work_date));
+
+            //区分
+            $w_time_results[$ii]['work_type']  = $worktime->work_type;
+
+            //出退時刻(出社、退社)、就業時刻(開始、終了)
+            if($worktime->result_work_start != ""){
+                $w_time_results[$ii]['result_work_start']  = date('G:i',strtotime($worktime->result_work_start));
+                if(strtotime($w_time_results[$ii]['result_work_start'] ) < strtotime($able_worktime_start)){
+                    $w_time_results[$ii]['real_work_start'] = $able_worktime_start;   
+                }
+                elseif(strtotime($w_time_results[$ii]['result_work_start'] ) >= strtotime("12:00") && strtotime($w_time_results[$ii]['result_work_start'] ) < strtotime("13:00")){
+                    $w_time_results[$ii]['real_work_start'] = "13:00";
+                }else{
+                    $w_time_results[$ii]['real_work_start'] = $w_time_results[$ii]['result_work_start'] ;
+                }
+            }
+            else{
+                $w_time_results[$ii]['result_work_start']  = "";
+                $w_time_results[$ii]['real_work_start'] = "";
+            }
+            if($worktime->result_work_end != ""){
+                $w_time_results[$ii]['result_work_end']  = date('G:i',strtotime($worktime->result_work_end));
+                if(strtotime($w_time_results[$ii]['result_work_end'] ) >= strtotime($able_worktime_end)){
+                    $w_time_results[$ii]['real_work_end'] = $able_worktime_end;   
+                }
+                elseif(strtotime($w_time_results[$ii]['result_work_end'] ) > strtotime("12:00") && strtotime($w_time_results[$ii]['result_work_end'] ) <= strtotime("13:00")){
+                    $w_time_results[$ii]['real_work_end'] = "12:00";
+                }else{
+                    $w_time_results[$ii]['real_work_end'] = $w_time_results[$ii]['result_work_end'] ;
+                }
+            }
+            else{
+                $w_time_results[$ii]['result_work_end'] = "";
+                $w_time_results[$ii]['real_work_end'] = "";
+            }
 
             //労働時間
-            if($worktime->result_work_start=="" || $worktime->result_work_end==""){
+            if($w_time_results[$ii]['real_work_start'] =="" || $w_time_results[$ii]['real_work_end'] ==""){
                 $w_time_results[$ii]['roudou_time']=0;
-            }elseif(strtotime($worktime->result_work_start) >= strtotime("13:00") || strtotime($worktime->result_work_end) <= strtotime("12:00")){
-                $w_time_results[$ii]['roudou_time']=(strtotime($worktime->result_work_end) - strtotime($worktime->result_work_start) )/ 3600 -1;
+            }elseif(strtotime($w_time_results[$ii]['real_work_start']) >= strtotime("13:00") || strtotime($w_time_results[$ii]['real_work_start']) <= strtotime("12:00")){
+                $w_time_results[$ii]['roudou_time']=(strtotime($w_time_results[$ii]['real_work_end']) - strtotime($w_time_results[$ii]['real_work_start']) )/ 3600 -1;
             }else{
-                $w_time_results[$ii]['roudou_time']=(strtotime($worktime->result_work_end) - strtotime($worktime->result_work_start) )/ 3600 -1;
+                $w_time_results[$ii]['roudou_time']=(strtotime($w_time_results[$ii]['real_work_end']) - strtotime($w_time_results[$ii]['real_work_start']) )/ 3600 -1;
             }
 
             //残業時間
@@ -151,7 +193,7 @@ class WorktimeController extends Controller
             }elseif($worktime->work_type == 4){ //午後半休
                 $w_time_results[$ii]['zangyou_time'] = $aftenoonoff_times + $w_time_results[$ii]['roudou_time'] - $basic_work_times;
             }else{
-                $w_time_results[$ii]['zangyou_time'] = 0;
+                $w_time_results[$ii]['zangyou_time'] = $w_time_results[$ii]['roudou_time'] - $basic_work_times;
             }
             
             //法定内残業時間
@@ -171,6 +213,13 @@ class WorktimeController extends Controller
             }
  
         }
+
+        /* 可能就業時間帯、基本就業時間帯、基本就業時間 */
+        $able_worktime_start = date('G:i',strtotime($master_worktime_type->able_worktime_start));
+        $able_worktime_end = date('G:i',strtotime($master_worktime_type->able_worktime_end));
+        $basic_worktime_start = date('G:i',strtotime($master_worktime_type->basic_worktime_start));
+        $basic_worktime_end = date('G:i',strtotime($master_worktime_type->basic_worktime_end));
+        $basic_worktimes = (strtotime($master_worktime_type->basic_worktime_end) - strtotime($master_worktime_type->basic_worktime_start))/3600 - $master_worktime_type->lunch_break_times;
 
         /* カレント月の回数、時間を集計し変数に格納 */
         $workday_counts=0;              //出勤日数
@@ -204,6 +253,14 @@ class WorktimeController extends Controller
         //compactで空のコレクション型を渡すとエラーになる為その場合はnullを入れる。
         if($worktimes->isEmpty()){
             $worktimes = null;
+            for($i=1;$i<=$month_lastday;$i++){
+                $w_time_results[$i]['day'] = $i;
+                $w_time_results[$i]['work_type']  = "";
+                $w_time_results[$i]['result_work_start'] ="";
+                $w_time_results[$i]['result_work_end'] = "";
+                $w_time_results[$i]['real_work_start'] = "";
+                $w_time_results[$i]['real_work_end'] = "";
+            }
         }
         if(empty($w_time_results)){
             $w_time_results = null;
@@ -229,6 +286,13 @@ class WorktimeController extends Controller
                 ->with('total_law_time_hours',$total_law_time_hours)
                 ->with('total_law_time_outer_hours',$total_law_time_outer_hours)
                 ->with('total_worktime_hours',$total_worktime_hours)
+                ->with('able_worktime_start',$able_worktime_start)
+                ->with('able_worktime_end',$able_worktime_end)
+                ->with('able_worktime_start',$able_worktime_start)
+                ->with('able_worktime_end',$able_worktime_end)
+                ->with('basic_worktime_start',$basic_worktime_start)
+                ->with('basic_worktime_end',$basic_worktime_end)
+                ->with('basic_worktimes',$basic_worktimes)
                 ->with('user_name',\Auth::user()->name); //ログイン者名
         }else{
             return view('worktime_index',compact('worktimes','w_time_results','master_worktime_type','worktypes','users'))
@@ -247,7 +311,12 @@ class WorktimeController extends Controller
                 ->with('total_overtime_hours',$total_overtime_hours)
                 ->with('total_law_time_hours',$total_law_time_hours)
                 ->with('total_law_time_outer_hours',$total_law_time_outer_hours)
-                ->with('total_worktime_hours',$total_worktime_hours);
+                ->with('total_worktime_hours',$total_worktime_hours)
+                ->with('able_worktime_start',$able_worktime_start)
+                ->with('able_worktime_end',$able_worktime_end)
+                ->with('basic_worktime_start',$basic_worktime_start)
+                ->with('basic_worktime_end',$basic_worktime_end)
+                ->with('basic_worktimes',$basic_worktimes);
         }
 
     }
