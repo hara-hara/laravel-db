@@ -23,12 +23,10 @@
                         
                     </tr>
                     <tr>
-                        <td class="text-center matrix-normal"></td>
                         @foreach ($users as $user)
-                            @if($user->id==$cur_user_id)
-                                <td class="text-center matrix-normal">
-                                    {{$user->name}}
-                                </td>
+                            @if($user->id==$cur_member_id)
+                            <td class="text-center matrix-normal">{{$user->member_no}}</td>
+                            <td class="text-center matrix-normal">{{$user->name}}</td>
                             @endif
                         @endforeach
                         <td class="text-center matrix-normal">{{ $master_worktime_type->id }}</td>
@@ -56,11 +54,11 @@
                         <td class="text-center matrix-normal">{{ $master_worktime_type->lunch_break_times }}</td>
                         <td class="text-center matrix-normal">{{ $master_worktime_type->dayoff_times }}</td>
                         <td class="text-center matrix-normal">{{ $master_worktime_type->morningoff_times }}</td>
-                        <td class="text-center matrix-normal">{{ $master_worktime_type->aftenoonoff_times }}</td>
+                        <td class="text-center matrix-normal">{{ $master_worktime_type->afternoonoff_times }}</td>
                     </tr>
                 </table>
 
-                <form id="change_koushin" action="{{ route('worktime.update',['cur_user_id'=>$cur_user_id]) }}" method="POST">
+                <form id="change_koushin" action="{{ route('worktime.update',['cur_member_id'=>$cur_member_id]) }}" method="POST">
                     @method('PUT')
                     @csrf
                     <div class="my-4">
@@ -68,10 +66,10 @@
                             <a href="#" data-id="koushin" onclick="changePost(this)" class="btn btn-primary w-10">更新</a> <!-- 更新ボタンクリックでメッセージを出す -->
                         </button>
                         <button class="btn btn-blue">
-                            <a class="btn btn-success" href="{{ route('worktime.index') }}/?cur_user_id=1&cur_year={{$cur_year}}&cur_month={{$cur_month-1}}">＜　前月</a>
+                            <a class="btn btn-success" href="{{ route('worktime.index') }}/?cur_member_id={{$cur_member_id}}&cur_year={{$cur_year}}&cur_month={{$cur_month-1}}">＜　前月</a>
                         </button>
                         <button class="btn btn-blue">
-                            <a class="btn btn-success" href="{{ route('worktime.index') }}/?cur_user_id=1&cur_year={{$cur_year}}&cur_month={{$cur_month+1}}">次月　＞</a>
+                            <a class="btn btn-success" href="{{ route('worktime.index') }}/?cur_member_id={{$cur_member_id}}&cur_year={{$cur_year}}&cur_month={{$cur_month+1}}">次月　＞</a>
                         </button>
                         <button class="btn btn-green">
                             <a class="btn btn-success" href="{{ route('pdf') }}">PDF出力</a>
@@ -133,7 +131,7 @@
                             <th class="matrix-normal">退社</th>
                             <th class="matrix-normal w-20">開始</th>
                             <th class="matrix-normal w-20">終了</th>
-                            <th class="matrix-normal">労働時刻</th>
+                            <th class="matrix-normal">労働時間</th>
                             <th class="matrix-normal">法定内残業</th>
                             <th class="matrix-normal">法定外残業</th>
                             <th class="matrix-normal">残業</th>

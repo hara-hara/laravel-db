@@ -21,6 +21,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'member_no',
+        'join_date',
+        'cur_used_dayoff',
+        'cur_getting_dayoff',
     ];
 
     /**

@@ -12,21 +12,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        //\App\Models\User::factory(10)->create(); //usersテーブルのサンプルレコードを作成
 
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+        
         $this->call([
-            //BunbougusSeeder::class,
-            //BunruisSeeder::class,
-            Master_worktime_typesSeeder::class,
-            UsersSeeder::class,
+            //Master_worktime_typesSeeder::class,
+            //UsersSeeder::class,
             WorktypesSeeder::class,
-            WorktimesSeeder::class,
-            User_group_type::class,
+            //WorktimesSeeder::class,
+            //User_group_typeSeeder::class,
         ]);
-
+        
     }
 }

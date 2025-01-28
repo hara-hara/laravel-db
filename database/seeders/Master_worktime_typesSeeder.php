@@ -21,7 +21,7 @@ class Master_worktime_typesSeeder extends Seeder
 				'lunch_break_times'=> '1',
 				'dayoff_times'=> '4',
 				'morningoff_times'=> '2',
-				'aftenoonoff_times'=> '2',
+				'afternoonoff_times'=> '2',
             ],            
 			[
 				'able_worktime_start' => '8:00',
@@ -31,7 +31,7 @@ class Master_worktime_typesSeeder extends Seeder
 				'lunch_break_times'=> '1',
 				'dayoff_times'=> '7',
 				'morningoff_times'=> '3',
-				'aftenoonoff_times'=> '4',
+				'afternoonoff_times'=> '4',
             ],
 
         ]);

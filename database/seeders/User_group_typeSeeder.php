@@ -28,7 +28,76 @@ class User_group_typeSeeder extends Seeder
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => null,
             ],
-
+            [
+                'user_id' => 3,
+                'group_id' => 2,
+                'master_id' => 2,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => null,
+            ],
+            [
+                'user_id' => 4,
+                'group_id' => 2,
+                'master_id' => 2,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => null,
+            ],
+            [
+                'user_id' => 5,
+                'group_id' => 2,
+                'master_id' => 2,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => null,
+            ],
+            [
+                'user_id' => 6,
+                'group_id' => 2,
+                'master_id' => 2,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => null,
+            ],
+            [
+                'user_id' => 7,
+                'group_id' => 2,
+                'master_id' => 2,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => null,
+            ],
+            [
+                'user_id' => 8,
+                'group_id' => 2,
+                'master_id' => 2,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => null,
+            ],
+            [
+                'user_id' => 9,
+                'group_id' => 2,
+                'master_id' => 2,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => null,
+            ],
+            [
+                'user_id' => 10,
+                'group_id' => 2,
+                'master_id' => 2,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => null,
+            ],
+            [
+                'user_id' => 11,
+                'group_id' => 2,
+                'master_id' => 2,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => null,
+            ],
+            [
+                'user_id' => 12,
+                'group_id' => 2,
+                'master_id' => 2,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => null,
+            ],
         ]);
 
     }
