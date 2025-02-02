@@ -13,6 +13,15 @@ use App\Models\Group;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Console\Command;
+use Illuminate\Mail\Mailables\Attachment;
+use Illuminate\Mail\Message;
+use Illuminate\Support\Facades\Mail;
+use Symfony\Component\Mime\Address;
+
+use App\Http\Mail\MailSend;
+
+
 class WorktimeController extends Controller
 {
     /**
@@ -127,12 +136,11 @@ class WorktimeController extends Controller
         ->where('m.id','=',$user_group_type->master_id)
         ->first();
 
-        /* 可能就業時間帯、基本就業時間帯、基本就業時間 */
+        /* 可能就業時間帯、基本就業時間帯(G:i 表記出力) */
         $able_worktime_start = date('G:i',strtotime($master_worktime_type->able_worktime_start));
         $able_worktime_end = date('G:i',strtotime($master_worktime_type->able_worktime_end));
         $basic_worktime_start = date('G:i',strtotime($master_worktime_type->basic_worktime_start));
         $basic_worktime_end = date('G:i',strtotime($master_worktime_type->basic_worktime_end));
-        $basic_worktimes = (strtotime($master_worktime_type->basic_worktime_end) - strtotime($master_worktime_type->basic_worktime_start))/3600 - $master_worktime_type->lunch_break_times;
 
         /* カレント月の回数、時間を集計し変数に格納 */
         $workday_counts=0;              //出勤日数
@@ -155,7 +163,7 @@ class WorktimeController extends Controller
 
 
         //基本就業時間 =  基本就業時間帯(終了) - 基本就業時間帯(開始) - 休憩時間 
-        $basic_work_times = (strtotime($master_worktime_type->basic_worktime_end) - strtotime($master_worktime_type->basic_worktime_start)) / 3600 - $master_worktime_type->dayoff_times; 
+        $basic_worktimes = (strtotime($master_worktime_type->basic_worktime_end) - strtotime($master_worktime_type->basic_worktime_start)) / 3600 - $master_worktime_type->lunch_break_times; 
         //休暇の工数
         $dayoff_times = $master_worktime_type->dayoff_times;
         //午前半休の工数
@@ -237,14 +245,18 @@ class WorktimeController extends Controller
                     }
                     //残業時間
                     if($worktime->work_type == 2){ //休暇
-                        $w_time_results[$ii]['zangyou_time'] = $dayoff_times + $w_time_results[$ii]['roudou_time'] - $basic_work_times;
+                        $w_time_results[$ii]['zangyou_time'] = $dayoff_times + $w_time_results[$ii]['roudou_time'] - $basic_worktimes;
                     }elseif($worktime->work_type == 3){ //午前半休
-                        $w_time_results[$ii]['zangyou_time'] = $morningoff_times + $w_time_results[$ii]['roudou_time'] - $basic_work_times;
+                        $w_time_results[$ii]['zangyou_time'] = $morningoff_times + $w_time_results[$ii]['roudou_time'] - $basic_worktimes;
                     }elseif($worktime->work_type == 4){ //午後半休
-                        $w_time_results[$ii]['zangyou_time'] = $afternoonoff_times + $w_time_results[$ii]['roudou_time'] - $basic_work_times;
+                        $w_time_results[$ii]['zangyou_time'] = $afternoonoff_times + $w_time_results[$ii]['roudou_time'] - $basic_worktimes;
                     }else{
-                        $w_time_results[$ii]['zangyou_time'] = $w_time_results[$ii]['roudou_time'] - $basic_work_times;
+                        $w_time_results[$ii]['zangyou_time'] = $w_time_results[$ii]['roudou_time'] - $basic_worktimes;
                     }
+                    if($w_time_results[$ii]['zangyou_time'] < 0){
+                        $w_time_results[$ii]['zangyou_time'] = 0;
+                    }
+
                     //法定内残業時間
                     if($w_time_results[$ii]['zangyou_time'] == 0){
                         $w_time_results[$ii]['houteinai_time'] = 0;
@@ -311,7 +323,7 @@ class WorktimeController extends Controller
         }
 
         //必要総就業時間(H)
-        $need_total_worktimes_hours = $workday_counts * $basic_work_times;
+        $need_total_worktimes_hours = $workday_counts * $basic_worktimes;
         //有休取得時間(H)
         $use_dayoff_hours = $use_dayoff_counts * $dayoff_times + $use_am_dayoff_counts * $morningoff_times + $use_pm_dayoff_counts * $afternoonoff_times ;
 
@@ -494,6 +506,18 @@ class WorktimeController extends Controller
      */
     public function update(Request $request)
     {
+
+        /*
+        Mail::raw('本文です。', function (Message $message) {
+            $message
+                ->to([
+                    new Address('home@hara.ciao.jp', 'Lara'),
+                    new Address('hara@hara.ciao.jp', 'Vel'),
+                ])
+                ->subject('タイトルtest');
+        }); 
+        */   
+
         //target_year,target_monthを取得する
         $cur_year = $request->input('cur_year');
         $cur_month = $request->input('cur_month');

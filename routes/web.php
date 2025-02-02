@@ -62,3 +62,6 @@ Route::post('/students_import','App\Http\Controllers\StudentsController@import')
 Route::post('/students_export','App\Http\Controllers\StudentsController@export')->name('export'); //追加
 
 Route::get('/pdf', 'App\Http\Controllers\ExportController@pdf')->name('pdf');
+
+// mail送信
+Route::get('/mail', [MailSendController::class, 'send']);
