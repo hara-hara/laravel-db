@@ -13,7 +13,7 @@ class ExportService
 {
     public $worktimes;
 
-    public function makePdf($req, $file_name,$cur_user_id,$cur_year,$cur_month)
+    public function makePdf($req, $file_name,$cur_member_id,$cur_year,$cur_month)
     {
         // もとになるExcelを読み込み
         $excel_file = storage_path('app/excel/template/hinaE.xlsx');
@@ -30,7 +30,7 @@ class ExportService
             'master_id',
         ])
         ->from('user_group_types as b')
-        ->where('user_id','=',$cur_user_id)
+        ->where('user_id','=',$cur_member_id)
         ->first();
 
         //基本勤務データ取得
@@ -43,7 +43,7 @@ class ExportService
             'm.lunch_break_times',
             'm.dayoff_times',
             'm.morningoff_times',
-            'm.aftenoonoff_times',
+            'm.afternoonoff_times',
         ])
         ->from('master_worktime_types as m')
         ->where('m.id','=',$user_group_type->master_id)
@@ -62,7 +62,7 @@ class ExportService
         $aftenoonoff_times = $master_worktime_type->aftenoonoff_times;
 
         // メイン勤怠データ取得
-        $worktimes = self::worktimes_fromDB($cur_user_id,$cur_year,$cur_month);
+        $worktimes = self::worktimes_fromDB($cur_member_id,$cur_year,$cur_month);
         $i=0;
         foreach($worktimes as $worktime){
             $i++;
@@ -147,7 +147,7 @@ class ExportService
         }
     }
 
-    public function worktimes_fromDB($cur_user_id,$cur_year,$cur_month)
+    public function worktimes_fromDB($cur_member_id,$cur_year,$cur_month)
     {
         $worktimes = Worktime::select([
             'b.work_date',
@@ -163,7 +163,7 @@ class ExportService
         //->join('worktypes as r', function($join) {
         //    $join->on('b.work_type', '=', 'r.id');
         //})
-        ->where('b.member_id','=',$cur_user_id)
+        ->where('b.member_id','=',$cur_member_id)
         ->whereYear('b.work_date', $cur_year)
         ->orwhereMonth('b.work_date', $cur_month)
         ->orderBy('b.work_date', 'ASC')

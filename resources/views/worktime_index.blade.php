@@ -72,7 +72,7 @@
                             <a class="btn btn-success" href="{{ route('worktime.index') }}/?cur_member_id={{$cur_member_id}}&cur_year={{$cur_year}}&cur_month={{$cur_month+1}}">次月　＞</a>
                         </button>
                         <button class="btn btn-green">
-                            <a class="btn btn-success" href="{{ route('pdf') }}">PDF出力</a>
+                            <a class="btn btn-success" href="{{ route('pdf') }}/?cur_member_id={{$cur_member_id}}&cur_year={{$cur_year}}&cur_month={{$cur_month}}">PDF出力</a>
                         </button>
                     </div>
 
