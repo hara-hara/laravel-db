@@ -6,9 +6,11 @@
             <div ><h1 class="text-white text-xl">勤怠管理システム</h1></div>
         </header>
         <main class="flex h-full">
+        
+        {{-- ここのコメントはHTML上には表示されません
             <aside class="w-1/5 bg-green-200">
                 @include('layouts.sidebar')
-            </aside>
+            </aside> --}}
             <section class="w-4/5 bg-green-100">
                 <h2 class="mx-1 my-2 text-2xl"><b>勤務表</b></h2>
                 <table class="mx-1 my-2">
@@ -48,9 +50,9 @@
                         <th class="px-2">PM半休(H)</th>
                     </tr>
                     <tr>
-                        <td class="text-center matrix-normal">{{ $able_worktime_start }}～{{ $able_worktime_end }}</td>
-                        <td class="text-center matrix-normal">{{ $basic_worktime_start }}～{{ $basic_worktime_end }}</td>
-                        <td class="text-center matrix-normal">{{ $basic_worktimes }}</td>
+                        <td class="text-center matrix-normal">{{ $cur_worktimes_total['able_worktime_start'] }}～{{ $cur_worktimes_total['able_worktime_end'] }}</td>
+                        <td class="text-center matrix-normal">{{ $cur_worktimes_total['basic_worktime_start'] }}～{{ $cur_worktimes_total['basic_worktime_end'] }}</td>
+                        <td class="text-center matrix-normal">{{ $cur_worktimes_total['basic_worktimes'] }}</td>
                         <td class="text-center matrix-normal">{{ $master_worktime_type->lunch_break_times }}</td>
                         <td class="text-center matrix-normal">{{ $master_worktime_type->dayoff_times }}</td>
                         <td class="text-center matrix-normal">{{ $master_worktime_type->morningoff_times }}</td>
@@ -94,11 +96,11 @@
                             <th class="px-2">必要総就業時間(H)</th>
                         </tr>
                         <tr>
-                            <td class="text-center matrix-normal">{{ $workday_counts }}</td>
-                            <td class="text-center matrix-normal">{{ $v_dayoff_counts }}</td>
-                            <td class="text-center matrix-normal">{{ $use_dayoff_counts }}</td>
-                            <td class="text-center matrix-normal">{{ $use_dayoff_hours }}</td>
-                            <td class="text-center matrix-normal">{{ $need_total_worktimes_hours }}</td>
+                            <td class="text-center matrix-normal">{{ $cur_worktimes_total['workday_counts'] }}</td>
+                            <td class="text-center matrix-normal">{{ $cur_worktimes_total['v_dayoff_counts'] }}</td>
+                            <td class="text-center matrix-normal">{{ $cur_worktimes_total['use_dayoff_counts'] }}</td>
+                            <td class="text-center matrix-normal">{{ $cur_worktimes_total['use_dayoff_hours'] }}</td>
+                            <td class="text-center matrix-normal">{{ $cur_worktimes_total['need_total_worktimes_hours'] }}</td>
                         </tr>
                         <tr class="matrix-header">
                             <th class="px-2">総労働時間(H)</th>
@@ -108,11 +110,11 @@
                             <th class="px-2">総就業時間(H)</th>
                         </tr>
                         <tr>
-                            <td class="text-center matrix-normal">{{ $total_work_hours }}</td>
-                            <td class="text-center matrix-normal">{{ $total_overtime_hours }}</td>
-                            <td class="text-center matrix-normal">{{ $total_law_time_hours }}</td>
-                            <td class="text-center matrix-normal">{{ $total_law_time_outer_hours }}</td>
-                            <td class="text-center matrix-normal">{{ $total_worktime_hours }}</td>
+                            <td class="text-center matrix-normal">{{ $cur_worktimes_total['total_work_hours'] }}</td>
+                            <td class="text-center matrix-normal">{{ $cur_worktimes_total['total_overtime_hours'] }}</td>
+                            <td class="text-center matrix-normal">{{ $cur_worktimes_total['total_law_time_hours'] }}</td>
+                            <td class="text-center matrix-normal">{{ $cur_worktimes_total['total_law_time_outer_hours'] }}</td>
+                            <td class="text-center matrix-normal">{{ $cur_worktimes_total['total_worktime_hours'] }}</td>
                         </tr>
                     </table>
                                         
@@ -140,11 +142,11 @@
                             <th class="matrix-normal">承認</th>
                             --}}
                         </tr>
-                        @for($ii=1;$ii<=$month_lastday;$ii++)
+                        @foreach($cur_worktimes as $cur_worktime)
                             <tr class="text-center">
-                                <td class="text-center matrix-normal">{{$ii}}</td>
+                                <td class="text-center matrix-normal">{{ $cur_worktime["day"] }}</td>
                                     <td class="text-center matrix-normal">
-                                        @switch(date('w',strtotime($cur_year."-".$cur_month."-".$ii) ))
+                                        @switch(date('w',strtotime($cur_year."-".$cur_month."-". $cur_worktime["day"] )))
                                             @case(0) <font color="red">日</font> @break
                                             @case(1) 月 @break
                                             @case(2) 火 @break
@@ -155,39 +157,39 @@
                                         @endswitch
                                     </td>
                                     <td class="matrix-normal">
-                                        <select class="py-1 block w-full rounded-md border-gray-300 shadow-sm text-xs text-gray-800 bg-white focus:ring-indigo-500 focus:border-indigo-500" name="work_type-{{ $ii }}">
+                                        <select class="py-1 block w-full rounded-md border-gray-300 shadow-sm text-xs text-gray-800 bg-white focus:ring-indigo-500 focus:border-indigo-500" name="work_type-{{ $cur_worktime['day'] }}">
                                             <option value="">選択して下さい</option>
                                             @foreach ($worktypes as $worktype)
-                                                <option value="{{ $worktype->id }}" @if($worktype->id == $w_time_results[$ii]['work_type']) selected @endif >
+                                                <option value="{{ $worktype->id }}" @if($worktype->id == $cur_worktime["work_type"]) selected @endif >
                                                     {{ $worktype->str }} 
                                                 </otion>
                                             @endforeach
                                         </select>
-                                        <input type="hidden" name="hidden-work_type-{{ $ii }}" value="{{ $w_time_results[$ii]['work_type'] }}">
+                                        <input type="hidden" name="hidden-work_type-{{ $cur_worktime['day'] }}" value="{{ $cur_worktime['work_type'] }}">
 
                                     </td>
                                     <td class="matrix-normal">
-                                        <input class="w-20 h-6" type="text" name="result_work_start-{{ $ii }}" value="{{ $w_time_results[$ii]['result_work_start']  }}"  placeholder="">
-                                        <input type="hidden" name="hidden-result_work_start-{{ $ii }}" value="{{ $w_time_results[$ii]['result_work_start']  }}">
+                                        <input class="w-20 h-6" type="text" name="result_work_start-{{ $cur_worktime['day'] }}" value="{{ $cur_worktime['result_work_start'] }}"  placeholder="">
+                                        <input type="hidden" name="hidden-result_work_start-{{ $cur_worktime['day'] }}" value="{{ $cur_worktime['result_work_start'] }}">
                                         @error('temp_result_work_start')
                                             <span style="color:red;">時間の形式で入力して下さい</span>
                                         @enderror
                                     </td>
                                     <td class="matrix-normal">
-                                        <input class="w-20 h-6" type="text" name="result_work_end-{{ $ii }}" value="{{ $w_time_results[$ii]['result_work_end']  }}"  placeholder="">
-                                        <input type="hidden" name="hidden_result_work_end-{{ $ii }}" value="{{ $w_time_results[$ii]['result_work_end']  }}">
+                                        <input class="w-20 h-6" type="text" name="result_work_end-{{ $cur_worktime['day'] }}" value="{{ $cur_worktime['result_work_end'] }}"  placeholder="">
+                                        <input type="hidden" name="hidden_result_work_end-{{ $cur_worktime['day'] }}" value="{{ $cur_worktime['result_work_end'] }}">
                                         @error('temp_result_work_end')
                                             <span style="color:red;">時間の形式で入力して下さい</span>
                                         @enderror
                                     </td>
 
-                                    @if($w_time_results[$ii]['result_work_start']  <> "" && $w_time_results[$ii]['result_work_end']  <> "")
-                                        <td class="matrix-normal">{{ $w_time_results[$ii]['real_work_start'] }}</td>
-                                        <td class="matrix-normal">{{ $w_time_results[$ii]['real_work_end'] }}</td>
-                                        <td class="matrix-normal">{{ $w_time_results[$ii]['roudou_time'] }}</td>
-                                        <td class="matrix-normal">{{ $w_time_results[$ii]['houteinai_time'] }}</td>
-                                        <td class="matrix-normal">{{ $w_time_results[$ii]['houteigai_time'] }}</td>
-                                        <td class="matrix-normal">{{ $w_time_results[$ii]['zangyou_time'] }}</td>
+                                    @if($cur_worktime['result_work_start'] <> "" && $cur_worktime['result_work_end'] <> "")
+                                        <td class="matrix-normal">{{ $cur_worktime['result_work_start'] }}</td>
+                                        <td class="matrix-normal">{{ $cur_worktime['result_work_end'] }}</td>
+                                        <td class="matrix-normal">{{ $cur_worktime['roudou_time'] }}</td>
+                                        <td class="matrix-normal">{{ $cur_worktime['houteinai_time'] }}</td>
+                                        <td class="matrix-normal">{{ $cur_worktime['houteigai_time'] }}</td>
+                                        <td class="matrix-normal">{{ $cur_worktime['zangyou_time'] }}</td>
                                         {{--
                                         <td class="matrix-normal"></td>
                                         <td class="matrix-normal"></td>
@@ -205,7 +207,7 @@
                                         --}}    
                                     @endif
                             </tr>
-                        @endfor
+                        @endforeach
                     </table>
                 </form>
             </section>

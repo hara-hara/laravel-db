@@ -6,6 +6,7 @@ use App\Models\Bunbougu;
 use Illuminate\Http\Request;
 use App\Models\Bunrui;
 use Illuminate\Support\Facades\Log; //デバッグ用
+use App\Models\User;
 
 class BunbouguController extends Controller
 {
@@ -31,15 +32,17 @@ class BunbouguController extends Controller
         //->where('r.str','LIKE','鉛筆')
         ->paginate(5);
 
+        $users=User::all();
+
 
         //ログインしていない場合、エラーが出ますので、以下のように処理を分けます。
         if(isset(\Auth::user()->name)){
-            return view('index',compact('bunbougus'))
+            return view('index',compact('bunbougus','users'))
                 ->with('page_id',request()->page)
                 ->with('i', (request()->input('page', 1) - 1) * 5)
                 ->with('user_name',\Auth::user()->name);
         }else{
-            return view('index',compact('bunbougus'))
+            return view('index',compact('bunbougus','users'))
                 ->with('page_id',request()->page)
                 ->with('i', (request()->input('page', 1) - 1) * 5);
         }
