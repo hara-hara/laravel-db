@@ -6,11 +6,9 @@
             <div ><h1 class="text-white text-xl">勤怠管理システム</h1></div>
         </header>
         <main class="flex h-full">
-        
-        {{-- ここのコメントはHTML上には表示されません
             <aside class="w-1/5 bg-green-200">
                 @include('layouts.sidebar')
-            </aside> --}}
+            </aside>
             <section class="w-4/5 bg-green-100">
                 <h2 class="mx-1 my-2 text-2xl"><b>勤務表</b></h2>
                 <table class="mx-1 my-2">

@@ -19,23 +19,24 @@
             <th class="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">価格</th>
             <th class="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">分類</th>
             <th class="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">登録者</th>
-            <th class="text-center w-30 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100 rounded-tr rounded-br"></th>
+            <th class="w-10 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100 rounded-tr rounded-br"></th>
             <th class="text-center w-30 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100 rounded-tr rounded-br"></th>
           </tr>
         </thead>
         <tbody>
-            @foreach ($bunbougus as $bunbougu)
-                <tr>
-                    <td class="border-t-2 border-gray-200 px-4 py-3">{{ $bunbougu->id }}</td>
-                    <td class="border-t-2 border-gray-200 px-4 py-3"><a class="" href="{{ route('bunbougu.show',$bunbougu->id) }}?page_id={{ $page_id }}">{{ $bunbougu->name }}</a></td>
-                    <td class="border-t-2 border-gray-200 px-4 py-3">{{ $bunbougu->kakaku }}円</td>
-                    <td class="border-t-2 border-gray-200 px-4 py-3">{{ $bunbougu->bunrui }}</td>
-                    <td class="border-t-2 border-gray-200 px-4 py-3">{{ $bunbougu->user->name }}</td>
+          <?php $i=0; ?>
+          @foreach ($bunbougus as $bunbougu)
+            <?php $i++; ?>
+              <tr>
+                @if($i==1)
+                    <td class="px-4 py-3">{{ $bunbougu->id }}</td>
+                    <td class="bpx-4 py-3"><a class="" href="{{ route('bunbougu.show',$bunbougu->id) }}?page_id={{ $page_id }}">{{ $bunbougu->name }}</a></td>
+                    <td class="px-4 py-3">{{ $bunbougu->kakaku }}円</td>
+                    <td class="px-4 py-3">{{ $bunbougu->bunrui }}</td>
+                    <td class="px-4 py-3 text-lg text-gray-900">{{ $bunbougu->user->name }}</td>
                     @auth
-
-
-                    <td class="text-center border-t-2 border-gray-200 px-4 py-3"><a class="btn btn-blue" href="{{ route('bunbougu.edit',$bunbougu->id) }}">変更</a></td>
-                    <td class="text-center border-t-2 border-gray-200 px-4 py-3">
+                    <td class="w-20 text-center"><a class="btn btn-blue" href="{{ route('bunbougu.edit',$bunbougu->id) }}">変更</a></td>
+                    <td class="w-20 text-center">
                         <form action="{{ route('bunbougu.destroy',$bunbougu->id) }}" method="POST">
                         @csrf
                         @method('DELETE')
@@ -43,9 +44,27 @@
                         </form>
                     </td>
                     @endauth
-                </tr>
 
-            @endforeach
+                  @else
+                    <td class="border-t-2 border-gray-200 px-4 py-3">{{ $bunbougu->id }}</td>
+                    <td class="border-t-2 border-gray-200 px-4 py-3"><a class="" href="{{ route('bunbougu.show',$bunbougu->id) }}?page_id={{ $page_id }}">{{ $bunbougu->name }}</a></td>
+                    <td class="border-t-2 border-gray-200 px-4 py-3">{{ $bunbougu->kakaku }}円</td>
+                    <td class="border-t-2 border-gray-200 px-4 py-3">{{ $bunbougu->bunrui }}</td>
+                    <td class="border-t-2 border-gray-200 px-4 py-3 text-lg text-gray-900">{{ $bunbougu->user->name }}</td>
+                    @auth
+                    <td class="border-t-2 border-gray-200 w-20 text-center"><a class="btn btn-blue" href="{{ route('bunbougu.edit',$bunbougu->id) }}">変更</a></td>
+                    <td class="border-t-2 border-gray-200 w-20 text-center">
+                        <form action="{{ route('bunbougu.destroy',$bunbougu->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-green" onclick='return confirm("削除しますか？");'>削除</button>
+                        </form>
+                    </td>
+                    @endauth
+                  @endif
+                  
+              </tr>
+          @endforeach
 
         </tbody>
       </table>
@@ -61,70 +80,7 @@
   </div>
 </section>
 
-    <div class=" w-screen  h-full relative flex flex-col">
-        <header class="h-20 bg-green-500 flex items-center justify-center">
-            <div ><h1 class="text-white text-xl">勤怠管理システム</h1></div>
-        </header>
-        <main class="flex h-full">
-{{--
-            <aside class="w-1/5 bg-green-200">
-                @include('layouts.sidebar')
-            </aside>
---}}
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="text-left">
-                        <h2 style="font-size:1rem;">文房具マスター</h2>
-                    </div>
-                    <div class="text-right">
-                        <a class="btn btn-success" href="{{ route('bunbougu.create') }}">新規登録</a>
-                    </div>
-                    @auth
-                    <div style="text-align:right">
-                        <h2 style="font-size:1rem;">ログイン者：{{ $user_name }}</h2>
-                    </div>
-                    @endauth
-                </div>
-            </div>
-            <x-message :message="session('message')" />
-            <table class="table table-bordered">
-                <tr>
-                    <th>No</th>
-                    <th>name</th>
-                    <th>kakaku</th>
-                    <th>bunrui</th>
-                    <th>user</th>
-                    @auth
-                    <th>btn1</th>
-                    <th>btn2</th>
-                    @endauth
 
-                </tr>
-                @foreach ($bunbougus as $bunbougu)
-                <tr>
-                    <td style="text-align:right">{{ $bunbougu->id }}</td>
-                    <td><a class="" href="{{ route('bunbougu.show',$bunbougu->id) }}?page_id={{ $page_id }}">{{ $bunbougu->name }}</a></td>
-                    <td style="text-align:right">{{ $bunbougu->kakaku }}円</td>
-                    <td style="text-align:right">{{ $bunbougu->bunrui }}</td>
-                    <td style="text-align:right">{{ $bunbougu->user->name }}</td>
-                    @auth
-                    <td style="text-align:center"><a class="btn btn-primary" href="{{ route('bunbougu.edit',$bunbougu->id) }}">変更</a></td>
-                    <td style="text-align:center">
-                        <form action="{{ route('bunbougu.destroy',$bunbougu->id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-danger" onclick='return confirm("削除しますか？");'>削除</button>
-                        </form>
-                    </td>
-                    @endauth
-                </tr>
-                @endforeach
-            </table>
-        
-            {{ $bunbougus->links() }}
-
-        </main>
-    </div>
 
     
     <section class="text-gray-600 body-font">
@@ -194,4 +150,5 @@
     </div>
   </div>
 </section>
+
 @endsection
